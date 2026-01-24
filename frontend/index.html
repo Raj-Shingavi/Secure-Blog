@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SecureBlog - Authentic Content Platform</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* PREMIUM THEME VARIABLES */
+    :root {
+      /* Brand Colors */
+      --primary: #6366f1;
+      /* Indigo-500 */
+      --primary-hover: #4f46e5;
+      --secondary: #1e293b;
+      /* Slate-800 */
+
+      /* Accents */
+      --accent-hero: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --accent-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+
+      /* Semantic */
+      --safe: #059669;
+      --safe-bg: #d1fae5;
+      --warning: #d97706;
+      --warning-bg: #fef3c7;
+      --risk: #dc2626;
+      --risk-bg: #fee2e2;
+
+      /* Surface Colors */
+      --bg-body: #f1f5f9;
+      /* Slate-100 */
+      --surface-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+
+      /* Borders & Shadows */
+      --border: #e2e8f0;
+      --radius-sm: 0.5rem;
+      --radius-md: 1rem;
+      --radius-lg: 1.5rem;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* GLOBAL RESET */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-body);
+      color: var(--text-main);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      color: var(--secondary);
+      margin: 0;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* COMPONENT: NAVBAR */
+    .navbar {
+      background: #1e293b;
+      /* Dark Navy Header */
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 4.5rem;
+    }
+
+    .brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: white;
+      /* White text on dark header */
+    }
+
+    .brand i {
+      color: var(--primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .nav-links a {
+      color: #cbd5e1;
+    }
+
+    /* Light Slate Text */
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: white;
+    }
+
+    /* COMPONENT: HERO */
+    .hero-section {
+      background: var(--surface-card);
+      padding: 4rem 1.5rem;
+      text-align: center;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-title {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* COMPONENT: CARDS */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 2.5rem;
+    }
+
+    .card {
+      background: var(--surface-card);
+      border-radius: var(--radius-md);
+      border: 1px solid white;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-body {
+      padding: 1.75rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-footer {
+      padding: 1.25rem 1.75rem;
+      background: #f8fafc;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* COMPONENT: BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      border-color: #cbd5e1;
+      color: var(--text-main);
+      background: white;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #f8fafc;
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.85rem;
+      font-size: 0.85rem;
+    }
+
+    /* UTILS & BADGES */
+    .badge {
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .badge-safe {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .badge-risk {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.875rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 1rem;
+      background: #f8fafc;
+      transition: all 0.2s;
+      box-sizing: border-box;
+    }
+
+    .form-control:focus {
+      outline: none;
+      background: white;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .footer {
+      margin-top: auto;
+      padding: 3rem 0;
+      background: #1e293b;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    /* LAYOUTS */
+    .blog-detail-layout {
+      display: grid;
+      gap: 3rem;
+    }
+
+    @media (min-width: 900px) {
+      .blog-detail-layout {
+        grid-template-columns: 2.5fr 1fr;
+      }
+    }
+
+    .version-panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      position: sticky;
+      top: 6rem;
+      box-shadow: var(--shadow-sm);
+    }
+  </style>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script crossorigin src="https://unpkg.com/history@5/umd/history.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const API_URL = '';
+    // --- API & Auth Logic ---
+    async function apiRequest(endpoint, method = 'GET', body = null) {
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const config = { method, headers };
+      if (body) config.body = JSON.stringify(body);
+
+      const res = await fetch(`${API_URL}${endpoint}`, config);
+      if (res.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+        throw new Error('Session expired');
+      }
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Request failed');
+      return data;
+    }
+
+    const { Link, useNavigate, useParams, Navigate, useLocation } = ReactRouterDOM;
+
+    // Helper: Score Badge
+    const ScoreBadge = ({ score, type }) => {
+      let colorClass = 'badge-safe';
+      const val = parseInt(score || 0);
+
+      if (type === 'plagiarism') {
+        if (val > 30) colorClass = 'badge-risk';
+        else if (val > 10) colorClass = 'badge-warning';
+      } else {
+        // AI Probability
+        if (val > 80) colorClass = 'badge-risk';
+        else if (val > 50) colorClass = 'badge-warning';
+      }
+
+      return (
+        <span className={`badge ${colorClass}`}>
+          {type === 'plagiarism' ? 'Originality Issue: ' : 'AI Probability: '}
+          {val}%
+        </span>
+      );
+    };
+
+    const Navbar = () => {
+      const token = localStorage.getItem('token');
+      const username = localStorage.getItem('username');
+      const navigate = useNavigate();
+      const location = useLocation(); // Hook inside Router context
+
+      const logout = () => { localStorage.clear(); navigate('/login'); };
+
+      return (
+        <header className="navbar">
+          <div className="container nav-content">
+            <Link to="/" className="brand"><i className="fas fa-shield-halved"></i> SecureBlog</Link>
+            <nav className="nav-links">
+              <Link to="/">All Blogs</Link>
+              {token ? (
+                <>
+                  <Link to="/create">Write Blog</Link>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderLeft: '1px solid var(--border)', paddingLeft: '1rem' }}>
+                    <span style={{ fontWeight: 600 }}>{username}</span>
+                    <button onClick={logout} className="btn btn-sm btn-outline"><i className="fas fa-sign-out-alt"></i></button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link to="/login">Login</Link>
+                  <Link to="/register" className="btn btn-primary btn-sm">Get Started</Link>
+                </>
+              )}
+            </nav>
+          </div>
+        </header>
+      );
+    };
+
+    const Footer = () => (
+      <footer className="footer">
+        <div className="container">
+          <p style={{ marginBottom: '0.5rem', fontWeight: 600 }}>SecureBlog &copy; 2026</p>
+          <p>Built with Python (FastAPI) & React</p>
+          <div style={{ marginTop: '1rem', fontSize: '1.2rem' }}>
+            <i className="fab fa-github" style={{ margin: '0 0.5rem' }}></i>
+          </div>
+        </div>
+      </footer>
+    );
+
+    const BlogCard = ({ blog }) => {
+      const date = new Date(blog.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      return (
+        <div className="card">
+          <div className="card-body">
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+              <ScoreBadge score={blog.plagiarism_score} type="plagiarism" />
+              <ScoreBadge score={blog.ai_score} type="ai" />
+            </div>
+            <Link to={`/blogs/${blog.id}`}><h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{blog.title}</h3></Link>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+              By <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{blog.author_name}</span> &bull; {date}
+            </p>
+            <p style={{ marginBottom: 0, flex: 1 }}>{blog.content.length > 120 ? blog.content.substring(0, 120) + '...' : blog.content}</p>
+          </div>
+          <div className="card-footer">
+            <Link to={`/blogs/${blog.id}`} className="btn btn-sm btn-primary">Read More</Link>
+            <Link to={`/blogs/${blog.id}/history`} className="btn btn-sm btn-outline" style={{ border: 0 }}><i className="fas fa-clock"></i> History</Link>
+          </div>
+        </div>
+      );
+    };
+
+    const BlogList = () => {
+      const [blogs, setBlogs] = React.useState([]);
+      const [loading, setLoading] = React.useState(true);
+      React.useEffect(() => {
+        apiRequest('/blogs').then(setBlogs).catch(console.error).finally(() => setLoading(false));
+      }, []);
+
+      if (loading) return (
+        <div className="container" style={{ textAlign: 'center', padding: '6rem 0' }}>
+          <i className="fas fa-circle-notch fa-spin" style={{ fontSize: '3rem', color: 'var(--primary)' }}></i>
+          <p style={{ marginTop: '1rem', color: 'var(--text-muted)' }}>Verifying content integrity...</p>
+        </div>
+      );
+
+      return (
+        <div>
+          <div className="hero-section">
+            <div className="container">
+              <h1 className="hero-title">Discover Authentic Thinking</h1>
+              <p style={{ fontSize: '1.25rem', color: '#64748b', maxWidth: '700px', margin: '0 auto' }}>
+                A secure space for verifiable content. Every article is analyzed for AI probability and originality.
+              </p>
+            </div>
+          </div>
+          <div className="container" style={{ paddingBottom: '4rem' }}>
+            <div className="grid-layout">{blogs.map(blog => <BlogCard key={blog.id} blog={blog} />)}</div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- COMPONENTS_PLACEHOLDER ---
+
+    const BlogCreate = () => {
+      const [title, setTitle] = React.useState('');
+      const [content, setContent] = React.useState('');
+      const [loading, setLoading] = React.useState(false);
+      const navigate = useNavigate();
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+          await apiRequest('/blogs', 'POST', { title, content });
+          navigate('/');
+        } catch (err) {
+          alert('Error: ' + err.message);
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="container" style={{ maxWidth: '800px', marginTop: '2rem' }}>
+          <div className="card">
+            <div className="card-body">
+              <h2 style={{ marginBottom: '1.5rem' }}>Publish New Article</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label className="form-label hidden">Article Title</label>
+                  <input className="form-control" value={title} onChange={e => setTitle(e.target.value)} required placeholder="Enter a descriptive title..." style={{ fontSize: '1.25rem', fontWeight: '600' }} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label hidden">Content</label>
+                  <textarea className="form-control" rows="12" value={content} onChange={e => setContent(e.target.value)} required placeholder="Start writing your thoughts..." style={{ resize: 'vertical' }} />
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <button className="btn btn-primary" disabled={loading}>
+                    {loading ? <i className="fas fa-spinner fa-spin"></i> : <><i className="fas fa-paper-plane"></i> Publish & Verify</>}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const BlogView = () => {
+      const { id } = useParams();
+      const [blog, setBlog] = React.useState(null);
+      const [isEditing, setIsEditing] = React.useState(false);
+      const [content, setContent] = React.useState('');
+      const [reason, setReason] = React.useState('');
+      const currentUserId = parseInt(localStorage.getItem('user_id'));
+
+      const load = () => apiRequest(`/blogs/${id}`).then(data => { setBlog(data); setContent(data.content); });
+      React.useEffect(() => { load(); }, [id]);
+
+      const handleUpdate = async (e) => {
+        e.preventDefault();
+        await apiRequest(`/blogs/${id}`, 'PUT', { content, change_description: reason });
+        setIsEditing(false); setReason(''); load();
+      };
+
+      if (!blog) return <div className="container" style={{ marginTop: '2rem' }}>Loading...</div>;
+
+      return (
+        <div className="container" style={{ marginTop: '2rem' }}>
+          <div className="blog-detail-layout">
+            <div>
+              <div style={{ marginBottom: '2rem' }}>
+                <h1 style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>{blog.title}</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--text-muted)' }}>
+                  <span><i className="fas fa-user-circle"></i> {blog.author_name}</span>
+                  <span><i className="fas fa-calendar"></i> {new Date(blog.created_at).toLocaleDateString()}</span>
+                </div>
+              </div>
+
+              {isEditing ? (
+                <div className="card">
+                  <div className="card-body">
+                    <h3>Edit Content</h3>
+                    <form onSubmit={handleUpdate}>
+                      <textarea className="form-control" rows="15" value={content} onChange={e => setContent(e.target.value)}></textarea>
+                      <input className="form-control" style={{ marginTop: '1rem' }} placeholder="Reason for change (e.g. Fixed typos)" value={reason} onChange={e => setReason(e.target.value)} required />
+                      <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+                        <button className="btn btn-primary">Save Changes</button>
+                        <button type="button" onClick={() => setIsEditing(false)} className="btn btn-outline">Cancel</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              ) : (
+                <div className="card" style={{ padding: '2.5rem', boxShadow: 'none', background: 'transparent', border: 0 }}>
+                  <div style={{ whiteSpace: 'pre-wrap', fontSize: '1.125rem', lineHeight: '1.8', color: '#334155' }}>{blog.content}</div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <div className="version-panel">
+                <h3><i className="fas fa-shield-alt"></i> Integrity Check</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Originality:</span> <ScoreBadge score={blog.plagiarism_score} type="plagiarism" /></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>AI Analysis:</span> <ScoreBadge score={blog.ai_score} type="ai" /></div>
+                </div>
+                <hr style={{ borderColor: 'var(--border)', margin: '1.5rem 0' }} />
+                <h3>Actions</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {currentUserId === blog.author_id && !isEditing && (
+                    <button onClick={() => setIsEditing(true)} className="btn btn-outline" style={{ width: '100%' }}><i className="fas fa-edit"></i> Edit Article</button>
+                  )}
+                  <Link to={`/blogs/${id}/history`} className="btn btn-outline" style={{ width: '100%' }}><i className="fas fa-history"></i> Version History</Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const VersionHistory = () => {
+      const { id } = useParams();
+      const [versions, setVersions] = React.useState([]);
+      const [sel, setSel] = React.useState(null);
+      const load = () => apiRequest(`/blogs/${id}/versions`).then(d => { setVersions(d); if (d.length) setSel(d[0]); });
+      React.useEffect(() => { load(); }, [id]);
+
+      return (
+        <div className="container" style={{ marginTop: '2rem' }}>
+          <Link to={`/blogs/${id}`} style={{ marginBottom: '1rem', display: 'inline-block' }}>&larr; Back to Article</Link>
+          <h1 style={{ marginBottom: '2rem' }}>Version History</h1>
+          <div className="blog-detail-layout">
+            <div className="card">
+              <div className="card-body">
+                {sel ? (
+                  <>
+                    <div style={{ background: '#f8fafc', padding: '1rem', marginBottom: '1rem', borderLeft: '4px solid var(--primary)' }}>
+                      <strong>Viewing Version {sel.version_number}</strong>
+                      <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Reason: {sel.change_description}</div>
+                    </div>
+                    <div style={{ whiteSpace: 'pre-wrap' }}>{sel.content}</div>
+                  </>
+                ) : 'Select a version'}
+              </div>
+            </div>
+
+            <div className="version-panel">
+              <h3>Changes</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {versions.map(v => (
+                  <div key={v.id} onClick={() => setSel(v)}
+                    style={{
+                      padding: '1rem', borderRadius: 'var(--radius-sm)', cursor: 'pointer',
+                      background: sel?.id === v.id ? '#e0e7ff' : 'white',
+                      border: '1px solid var(--border)'
+                    }}>
+                    <div style={{ fontWeight: 600 }}>Version {v.version_number}</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{new Date(v.created_at).toLocaleString()}</div>
+                    <div style={{ fontSize: '0.9rem', marginTop: '0.25rem' }}>{v.change_description}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const Auth = ({ type }) => {
+      const [data, setData] = React.useState({ username: '', email: '', password: '' });
+      const [showPass, setShowPass] = React.useState(false);
+      const navigate = useNavigate();
+      const handleChange = e => setData({ ...data, [e.target.name]: e.target.value });
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          if (type === 'login') {
+            const res = await apiRequest('/auth/login', 'POST', { email: data.email, password: data.password });
+            localStorage.setItem('token', res.access_token);
+            localStorage.setItem('username', res.username);
+            localStorage.setItem('user_id', res.user_id);
+            navigate('/');
+          } else {
+            await apiRequest('/auth/register', 'POST', data);
+            navigate('/login');
+          }
+        } catch (err) { alert(err.message); }
+      };
+
+      return (
+        <div className="container" style={{ display: 'flex', justifyContent: 'center', marginTop: '4rem' }}>
+          <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
+            <div className="card-body">
+              <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>{type === 'login' ? 'Welcome Back' : 'Join SecureBlog'}</h2>
+              <form onSubmit={handleSubmit}>
+                {type === 'register' && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', fontWeight: 500, marginBottom: '0.5rem' }}>Username</label>
+                    <input className="form-control" name="username" value={data.username} onChange={handleChange} required />
+                  </div>
+                )}
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontWeight: 500, marginBottom: '0.5rem' }}>Email</label>
+                  <input className="form-control" type="email" name="email" value={data.email} onChange={handleChange} required />
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontWeight: 500, marginBottom: '0.5rem' }}>Password</label>
+                  <input className="form-control" type={showPass ? "text" : "password"} name="password" value={data.password} onChange={handleChange} required />
+                  <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
+                    <input type="checkbox" checked={showPass} onChange={() => setShowPass(!showPass)} id="sp" />
+                    <label htmlFor="sp" style={{ cursor: 'pointer' }}>Show Password</label>
+                  </div>
+                </div>
+                <button className="btn btn-primary" style={{ width: '100%' }}>{type === 'login' ? 'Login' : 'Create Account'}</button>
+              </form>
+              <p style={{ textAlign: 'center', marginTop: '1.5rem', color: 'var(--text-muted)' }}>
+                {type === 'login' ? "Don't have an account? " : "Already have an account? "}
+                <Link to={type === 'login' ? "/register" : "/login"} style={{ color: 'var(--primary)', fontWeight: 600 }}>
+                  {type === 'login' ? "Sign Up" : "Login"}
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const App = () => {
+      const { BrowserRouter, Routes, Route } = ReactRouterDOM;
+      return (
+        <BrowserRouter>
+          <Navbar />
+          <div style={{ minHeight: '80vh' }}>
+            <Routes>
+              <Route path="/" element={<BlogList />} />
+              <Route path="/login" element={<Auth type="login" />} />
+              <Route path="/register" element={<Auth type="register" />} />
+              <Route path="/create" element={<BlogCreate />} />
+              <Route path="/blogs/:id" element={<BlogView />} />
+              <Route path="/blogs/:id/history" element={<VersionHistory />} />
+            </Routes>
+          </div>
+          <Footer />
+        </BrowserRouter>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+
+</html>
