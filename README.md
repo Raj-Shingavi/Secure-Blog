@@ -69,10 +69,6 @@ SecureBlog is a secure, verifiable blogging platform designed to promote authent
     ```bash
     python main.py
     ```
-    *Alternatively, use `uvicorn`:*
-    ```bash
-    uvicorn main:app --reload
-    ```
 
 2.  **Access the App**
     Open your browser and navigate to:
