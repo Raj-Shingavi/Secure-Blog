@@ -1,6 +1,6 @@
 const API_URL = ''; // Relative path (served from same origin)
 
-export const loginUser = async (email, password) => {
+const loginUser = async (email, password) => {
     const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -13,7 +13,7 @@ export const loginUser = async (email, password) => {
     return res.json();
 };
 
-export const registerUser = async (username, email, password) => {
+const registerUser = async (username, email, password) => {
     const res = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -26,7 +26,7 @@ export const registerUser = async (username, email, password) => {
     return res.json();
 };
 
-export const fetchWithAuth = async (endpoint, options = {}) => {
+const fetchWithAuth = async (endpoint, options = {}) => {
     const token = localStorage.getItem('token');
     const headers = {
         'Content-Type': 'application/json',
@@ -43,7 +43,9 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
 
     if (res.status === 401) {
         localStorage.removeItem('token');
-        window.location.href = '/login';
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('username');
+        window.location.hash = '#/login'; // Redirect to hash login
         throw new Error('Unauthorized');
     }
 
@@ -54,4 +56,16 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
 
     const err = isJson ? await res.json() : { detail: res.statusText };
     throw new Error(err.detail || 'Request failed');
+};
+
+const deleteBlog = async (id) => {
+    return await fetchWithAuth(`/blogs/${id}`, {
+        method: 'DELETE'
+    });
+};
+
+const restoreBlogVersion = async (blogId, versionId) => {
+    return await fetchWithAuth(`/blogs/${blogId}/restore/${versionId}`, {
+        method: 'POST'
+    });
 };

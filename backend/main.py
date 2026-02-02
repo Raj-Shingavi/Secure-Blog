@@ -79,7 +79,9 @@ async def login(user: UserLogin):
 
 # --- Blog Routes ---
 @app.get("/blogs")
-def get_blogs():
+def get_blogs(author_id: int = None):
+    if author_id:
+        return db_utils.execute_read_query("SELECT blogs.*, users.username as author_name FROM blogs JOIN users ON blogs.author_id = users.id WHERE blogs.author_id = %s ORDER BY created_at DESC", (author_id,))
     return db_utils.execute_read_query("SELECT blogs.*, users.username as author_name FROM blogs JOIN users ON blogs.author_id = users.id ORDER BY created_at DESC")
 
 @app.get("/blogs/{blog_id}")
@@ -141,6 +143,57 @@ async def update_blog(blog_id: int, blog: BlogUpdate, current_user: dict = Depen
 
     return {"msg": "Blog updated", "version": next_version}
 
+@app.delete("/blogs/{blog_id}")
+async def delete_blog(blog_id: int, current_user: dict = Depends(get_current_user)):
+    # Check existence
+    existing = db_utils.execute_read_query("SELECT * FROM blogs WHERE id = %s", (blog_id,))
+    if not existing:
+         raise HTTPException(status_code=404, detail="Blog not found")
+    
+    # Check Auth
+    if existing[0]['author_id'] != current_user['id']:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this blog")
+
+    # Delete (Cascading delete should handle versions if configured, but let's be safe/explicit if needed, 
+    # assuming ON DELETE CASCADE is NOT set in schema for safety, we delete versions first or rely on DB)
+    # Checking schema.sql would be good, but standard practice:
+    # If foreign keys have ON DELETE CASCADE, deleting blog is enough.
+    # Assuming standard setup.
+    
+    db_utils.execute_write_query("DELETE FROM blogs WHERE id = %s", (blog_id,))
+    
+    return {"msg": "Blog deleted successfully"}
+
+@app.post("/blogs/{blog_id}/restore/{version_id}")
+async def restore_blog_version(blog_id: int, version_id: int, current_user: dict = Depends(get_current_user)):
+    # 1. Verify Blog Ownership
+    blog = db_utils.execute_read_query("SELECT * FROM blogs WHERE id = %s", (blog_id,))
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog not found")
+    if blog[0]['author_id'] != current_user['id']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    # 2. Get Version Content
+    version = db_utils.execute_read_query("SELECT * FROM blog_versions WHERE id = %s AND blog_id = %s", (version_id, blog_id))
+    if not version:
+        raise HTTPException(status_code=404, detail="Version not found")
+    
+    restored_content = version[0]['content']
+    
+    # 3. Create New Version (Restore)
+    versions = db_utils.execute_read_query("SELECT MAX(version_number) as v_num FROM blog_versions WHERE blog_id = %s", (blog_id,))
+    next_version = (versions[0]['v_num'] or 0) + 1
+
+    db_utils.execute_write_query(
+        "INSERT INTO blog_versions (blog_id, content, change_description, version_number) VALUES (%s, %s, %s, %s)",
+        (blog_id, restored_content, f"Restored from Version {version[0]['version_number']}", next_version)
+    )
+
+    # 4. Update Main Blog
+    db_utils.execute_write_query("UPDATE blogs SET content = %s WHERE id = %s", (restored_content, blog_id))
+
+    return {"msg": f"Restored to version {version[0]['version_number']}", "new_version": next_version}
+
 @app.get("/blogs/{blog_id}/versions")
 def get_blog_versions(blog_id: int):
     return db_utils.execute_read_query("SELECT * FROM blog_versions WHERE blog_id = %s ORDER BY version_number DESC", (blog_id,))
@@ -159,13 +212,10 @@ import os
 # main.py is in /backend, so we go up one level then into /frontend
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
-SRC_DIR = os.path.join(FRONTEND_DIR, "src")
 
-# Ensure the directories exist before mounting
-if os.path.isdir(SRC_DIR):
-    app.mount("/src", StaticFiles(directory=SRC_DIR), name="src")
-else:
-    print(f"Warning: Directory '{SRC_DIR}' not found. /src route will not be available (OK if using single-file index.html).")
+# Ensure the frontend directory exists
+if not os.path.isdir(FRONTEND_DIR):
+    print(f"Warning: Directory '{FRONTEND_DIR}' not found. Frontend will not be served.")
 
 @app.get("/")
 async def serve_root():
