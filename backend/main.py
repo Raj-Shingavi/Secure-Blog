@@ -9,6 +9,11 @@ import os
 
 app = FastAPI()
 
+@app.on_event("startup")
+def startup_event():
+    db_utils.init_db()
+    print("Database initialized on startup")
+
 # --- Pydantic Models ---
 class UserRegister(BaseModel):
     username: str

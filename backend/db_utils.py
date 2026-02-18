@@ -1,5 +1,4 @@
 import mysql.connector
-from mysql.connector import Error
 import os
 from contextlib import contextmanager
 
@@ -7,7 +6,7 @@ from contextlib import contextmanager
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_USER = os.getenv("DB_USER", "root")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
-DB_NAME = os.getenv("DB_NAME", "secure_blog_db")
+DB_NAME = os.getenv("DB_NAME", "blog_db")
 
 def get_db_connection():
     """Establishes a connection to the MySQL database."""
@@ -19,37 +18,31 @@ def get_db_connection():
             database=DB_NAME
         )
         return connection
-    except Error as e:
+    except mysql.connector.Error as e:
         print(f"Error connecting to MySQL: {e}")
-        # If database does not exist, try to create it (for initial setup)
-        if e.errno == 1049: # Unknown database
-             create_database()
-             return mysql.connector.connect(
-                host=DB_HOST,
-                user=DB_USER,
-                password=DB_PASSWORD,
-                database=DB_NAME
-            )
         return None
 
-def create_database():
-    """Creates the database if it doesn't exist."""
+def init_db():
+    """Initializes the database tables from schema.sql."""
+    # Note: This assumes the DATABASE itself exists. 
+    # If not, we might need a separate step to CREATE DATABASE IF NOT EXISTS.
+    
     try:
-        connection = mysql.connector.connect(
+        # First connect without DB to ensure it exists
+        conn_init = mysql.connector.connect(
             host=DB_HOST,
             user=DB_USER,
             password=DB_PASSWORD
         )
-        cursor = connection.cursor()
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
-        print(f"Database '{DB_NAME}' created or already exists.")
-        cursor.close()
-        connection.close()
-    except Error as e:
+        cursor_init = conn_init.cursor()
+        cursor_init.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
+        conn_init.commit()
+        cursor_init.close()
+        conn_init.close()
+    except mysql.connector.Error as e:
         print(f"Error creating database: {e}")
+        return
 
-def init_db():
-    """Initializes the database tables from schema.sql."""
     conn = get_db_connection()
     if conn is None:
         print("Failed to connect to database for initialization.")
@@ -63,27 +56,22 @@ def init_db():
     try:
         with open(schema_path, 'r') as f:
             sql_script = f.read()
-        
-        # Split statements by semicolon (simple parsing)
-        commands = sql_script.split(';')
-        
-        for command in commands:
-            cleaned_command = command.strip()
-            if cleaned_command:
-                cursor.execute(cleaned_command)
-                
+            
+        # MySQL connector's execute method doesn't support multiple statements by default
+        # multi=True allows it.
+        for result in cursor.execute(sql_script, multi=True):
+            pass # Consume the generator
+            
         conn.commit()
         print("Database tables initialized from schema.sql.")
         
     except FileNotFoundError:
         print(f"Error: Could not find schema.sql at {schema_path}")
-    except Error as e:
+    except mysql.connector.Error as e:
         print(f"Error initializing database: {e}")
     finally:
         cursor.close()
         conn.close()
-
-# ... (Previous configuration code remains the same until init_db)
 
 @contextmanager
 def get_db_cursor(commit=False):
@@ -92,13 +80,15 @@ def get_db_cursor(commit=False):
     if conn is None:
         yield None
         return
-        
+    
+    # Dictionary cursor for dict-like results (similar to SQLite Row)
     cursor = conn.cursor(dictionary=True)
+    
     try:
         yield cursor
         if commit:
             conn.commit()
-    except Error as e:
+    except mysql.connector.Error as e:
         print(f"Database Error: {e}")
     finally:
         cursor.close()
@@ -106,13 +96,20 @@ def get_db_cursor(commit=False):
 
 def execute_read_query(query, params=()):
     """Executes a read query (SELECT)."""
+    # MySQL uses %s, so no replacement needed if we stick to that standard.
+    # But just in case any old SQLite ? crept in (though we were using %s in main.py)
+    # query = query.replace('?', '%s') 
+    
     with get_db_cursor(commit=False) as cursor:
         if cursor is None: return []
         cursor.execute(query, params)
-        return cursor.fetchall()
+        rows = cursor.fetchall()
+        return rows
 
 def execute_write_query(query, params=()):
     """Executes a write query (INSERT, UPDATE, DELETE)."""
+    # query = query.replace('?', '%s')
+    
     with get_db_cursor(commit=True) as cursor:
         if cursor is None: return None
         cursor.execute(query, params)
