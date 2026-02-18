@@ -32,7 +32,7 @@
 ### Backend
 - **Language**: Python 3.9+
 - **Framework**: [FastAPI](https://fastapi.tiangolo.com/) - High performance, easy to learn.
-- **Database**: SQLite (built-in, zero config).
+- **Database**: MySQL
 - **Security**: `passlib` for hashing, `python-jose` for JWTs.
 
 ### Frontend
